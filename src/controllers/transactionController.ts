@@ -11,7 +11,7 @@ export const addDeposit = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { amount, receipt } = req.body;
+    const { amount, receipt, description } = req.body;
 
     if (!amount || amount <= 0) {
       res.status(400).json({ message: "Please enter a valid amount" });
@@ -30,7 +30,7 @@ export const addDeposit = async (
       type: "DEPOSIT",
       status: "COMPLETED", // Assuming immediate completion per requirement "added to balance"
       receipt: receipt || "",
-      description: "Deposit",
+      description: description || "Deposit",
     });
 
     // Update user balance and income
@@ -178,6 +178,9 @@ export const getTransactionById = async (
       res.status(401).json({ message: "Not authorized" });
       return;
     }
+
+    // Populate user details after verification
+    await transaction.populate("user", "username email");
 
     res.json(transaction);
   } catch (error) {

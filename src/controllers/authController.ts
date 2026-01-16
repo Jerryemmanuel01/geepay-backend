@@ -41,7 +41,7 @@ export const registerUser = async (
     // Send verification email
     const verificationUrl = `${
       process.env.FRONTEND_URL || "http://localhost:3000"
-    }/verify-email/${verificationToken}`;
+    }/auth/verify-email/${verificationToken}`;
     const message = `Please confirm your email by clicking here: ${verificationUrl}\n\nThis link expires in 10 minutes.`;
 
     try {
@@ -134,7 +134,7 @@ export const resendVerification = async (
 
     const verificationUrl = `${
       process.env.FRONTEND_URL || "http://localhost:3000"
-    }/verify-email/${verificationToken}`;
+    }/auth/verify-email/${verificationToken}`;
     const message = `Please confirm your email by clicking here: ${verificationUrl}\n\nThis link expires in 10 minutes.`;
 
     await sendEmail({
@@ -207,7 +207,7 @@ export const forgotPassword = async (
     // "token is passed to the reset password page"
     const resetUrl = `${
       process.env.FRONTEND_URL || "http://localhost:3000"
-    }/reset-password?token=${resetToken}`;
+    }/auth/reset-password?token=${resetToken}`;
     const message = `You requested a password reset. Please go to this link to reset your password: ${resetUrl}`;
 
     try {

@@ -7,12 +7,14 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
 const morgan_1 = __importDefault(require("morgan"));
+const path_1 = __importDefault(require("path"));
 const app = (0, express_1.default)();
 // Middleware
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
-app.use((0, helmet_1.default)());
+app.use((0, helmet_1.default)({ crossOriginResourcePolicy: false })); // Allow cross-origin for images
 app.use((0, morgan_1.default)("dev"));
+app.use(express_1.default.static(path_1.default.join(__dirname, "../public")));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const swagger_1 = __importDefault(require("./config/swagger"));
 app.use("/api-docs", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_1.default));

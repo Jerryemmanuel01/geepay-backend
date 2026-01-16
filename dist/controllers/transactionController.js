@@ -20,7 +20,7 @@ const User_1 = __importDefault(require("../models/User"));
 // @access  Private
 const addDeposit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { amount, receipt } = req.body;
+        const { amount, receipt, description } = req.body;
         if (!amount || amount <= 0) {
             res.status(400).json({ message: "Please enter a valid amount" });
             return;
@@ -36,7 +36,7 @@ const addDeposit = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             type: "DEPOSIT",
             status: "COMPLETED", // Assuming immediate completion per requirement "added to balance"
             receipt: receipt || "",
-            description: "Deposit",
+            description: description || "Deposit",
         });
         // Update user balance and income
         const user = yield User_1.default.findById(req.user._id);
@@ -163,6 +163,8 @@ const getTransactionById = (req, res) => __awaiter(void 0, void 0, void 0, funct
             res.status(401).json({ message: "Not authorized" });
             return;
         }
+        // Populate user details after verification
+        yield transaction.populate("user", "username email");
         res.json(transaction);
     }
     catch (error) {

@@ -3,13 +3,17 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 
+import path from "path";
+
 const app: Application = express();
 
 // Middleware
 app.use(express.json());
 app.use(cors());
-app.use(helmet());
+app.use(helmet({ crossOriginResourcePolicy: false })); // Allow cross-origin for images
 app.use(morgan("dev"));
+
+app.use(express.static(path.join(__dirname, "../public")));
 
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger";

@@ -49,6 +49,7 @@ exports.resetPassword = exports.forgotPassword = exports.loginUser = exports.res
 const User_1 = __importDefault(require("../models/User"));
 const generateToken_1 = __importStar(require("../utils/generateToken"));
 const sendEmail_1 = __importDefault(require("../utils/sendEmail"));
+const emailTemplate_1 = require("../utils/emailTemplate");
 // @desc    Register a new user
 // @route   POST /api/auth/register
 // @access  Public
@@ -75,13 +76,20 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             verificationTokenExpires,
         });
         // Send verification email
-        const verificationUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/verify-email/${verificationToken}`;
-        const message = `Please confirm your email by clicking here: ${verificationUrl}\n\nThis link expires in 10 minutes.`;
+        const verificationUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/auth/verify-email/${verificationToken}`;
+        const message = `Please confirm your email by clicking here: ${verificationUrl}`;
+        const html = (0, emailTemplate_1.generateEmailTemplate)({
+            title: "Welcome to Geepay!",
+            body: `Thank you for registering. Please confirm your email address to get started.\n\nThis link expires in 10 minutes.`,
+            link: verificationUrl,
+            linkText: "Verify Email",
+        });
         try {
             yield (0, sendEmail_1.default)({
                 email: user.email,
                 subject: "Geepay Email Verification",
                 message,
+                html,
             });
             res.status(201).json({
                 message: "User registered. Please check your email to verify your account.",
@@ -150,12 +158,19 @@ const resendVerification = (req, res) => __awaiter(void 0, void 0, void 0, funct
         user.verificationToken = verificationToken;
         user.verificationTokenExpires = verificationTokenExpires;
         yield user.save();
-        const verificationUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/verify-email/${verificationToken}`;
-        const message = `Please confirm your email by clicking here: ${verificationUrl}\n\nThis link expires in 10 minutes.`;
+        const verificationUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/auth/verify-email/${verificationToken}`;
+        const message = `Please confirm your email by clicking here: ${verificationUrl}`;
+        const html = (0, emailTemplate_1.generateEmailTemplate)({
+            title: "Verify Your Email",
+            body: `You requested a new verification link. Please confirm your email address to continue.\n\nThis link expires in 10 minutes.`,
+            link: verificationUrl,
+            linkText: "Verify Email",
+        });
         yield (0, sendEmail_1.default)({
             email: user.email,
             subject: "Geepay Email Verification (Resend)",
             message,
+            html,
         });
         res.status(200).json({ message: "Verification email resent." });
     }
@@ -211,13 +226,20 @@ const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
         user.resetPasswordExpire = resetExpires;
         yield user.save();
         // "token is passed to the reset password page"
-        const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/reset-password?token=${resetToken}`;
+        const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/auth/reset-password?token=${resetToken}`;
         const message = `You requested a password reset. Please go to this link to reset your password: ${resetUrl}`;
+        const html = (0, emailTemplate_1.generateEmailTemplate)({
+            title: "Reset Your Password",
+            body: `We received a request to reset your password. If you didn't make this request, you can safely ignore this email.\n\nOtherwise, click the button below to reset your password.`,
+            link: resetUrl,
+            linkText: "Reset Password",
+        });
         try {
             yield (0, sendEmail_1.default)({
                 email: user.email,
                 subject: "Geepay Password Reset",
                 message,
+                html,
             });
             res.status(200).json({ message: "Password reset email sent" });
         }

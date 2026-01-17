@@ -2,8 +2,12 @@ import express from "express";
 import {
   getUserProfile,
   updateTransactionPin,
+  getUnapprovedUsers,
+  approveUser,
+  getAllUsers,
+  getUserDetails,
 } from "../controllers/userController";
-import { protect } from "../middleware/authMiddleware";
+import { protect, admin } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
@@ -76,5 +80,11 @@ router.get("/profile", getUserProfile);
  *         description: Invalid PIN format
  */
 router.put("/profile/pin", updateTransactionPin);
+
+router.get("/unapproved", protect, admin, getUnapprovedUsers);
+router.put("/:id/approve", protect, admin, approveUser);
+
+router.get("/", protect, admin, getAllUsers);
+router.get("/:id", protect, admin, getUserDetails);
 
 export default router;

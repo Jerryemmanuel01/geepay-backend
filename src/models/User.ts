@@ -10,6 +10,8 @@ export interface IUser extends Document {
   totalIncome: number;
   totalOutgoing: number;
   isVerified: boolean;
+  role: "user" | "admin";
+  isApproved: boolean;
   verificationToken?: string;
   verificationTokenExpires?: Date;
   resetPasswordToken?: string;
@@ -51,6 +53,15 @@ const UserSchema: Schema = new Schema(
       default: 0,
     },
     isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
+    isApproved: {
       type: Boolean,
       default: false,
     },

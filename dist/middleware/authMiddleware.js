@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.protect = void 0;
+exports.admin = exports.protect = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const User_1 = __importDefault(require("../models/User"));
 const protect = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -27,6 +27,12 @@ const protect = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
                 res.status(401).json({ message: "Not authorized, user not found" });
                 return;
             }
+            if (!req.user.isApproved) {
+                res
+                    .status(403)
+                    .json({ message: "Not authorized. Account pending approval." });
+                return;
+            }
             next();
         }
         catch (error) {
@@ -39,3 +45,12 @@ const protect = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.protect = protect;
+const admin = (req, res, next) => {
+    if (req.user && req.user.role === "admin") {
+        next();
+    }
+    else {
+        res.status(401).json({ message: "Not authorized as an admin" });
+    }
+};
+exports.admin = admin;

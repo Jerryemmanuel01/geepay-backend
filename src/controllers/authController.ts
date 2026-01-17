@@ -31,10 +31,17 @@ export const registerUser = async (
     const verificationToken = generateRandomToken();
     const verificationTokenExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
+    // Determine if first user
+    const isFirstAccount = (await User.countDocuments({})) === 0;
+    const role = isFirstAccount ? "admin" : "user";
+    const isApproved = isFirstAccount; // First user is auto-approved
+
     const user = await User.create({
       username,
       email,
       password,
+      role,
+      isApproved,
       verificationToken,
       verificationTokenExpires,
     });
@@ -185,6 +192,8 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         _id: user._id,
         username: user.username,
         email: user.email,
+        role: user.role,
+        isApproved: user.isApproved,
         token,
       });
     } else {

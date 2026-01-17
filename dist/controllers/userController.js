@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateTransactionPin = exports.getUserProfile = void 0;
+exports.approveUser = exports.getUnapprovedUsers = exports.updateTransactionPin = exports.getUserProfile = void 0;
 const Transaction_1 = __importDefault(require("../models/Transaction"));
 const User_1 = __importDefault(require("../models/User"));
 // @desc    Get user profile / dashboard data
@@ -97,3 +97,36 @@ const updateTransactionPin = (req, res) => __awaiter(void 0, void 0, void 0, fun
     }
 });
 exports.updateTransactionPin = updateTransactionPin;
+// @desc    Get all unapproved users
+// @route   GET /api/users/unapproved
+// @access  Private/Admin
+const getUnapprovedUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const users = yield User_1.default.find({ isApproved: false }).select("-password");
+        res.json(users);
+    }
+    catch (error) {
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+exports.getUnapprovedUsers = getUnapprovedUsers;
+// @desc    Approve a user
+// @route   PUT /api/users/:id/approve
+// @access  Private/Admin
+const approveUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield User_1.default.findById(req.params.id);
+        if (user) {
+            user.isApproved = true;
+            yield user.save();
+            res.json({ message: "User approved successfully" });
+        }
+        else {
+            res.status(404).json({ message: "User not found" });
+        }
+    }
+    catch (error) {
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+exports.approveUser = approveUser;

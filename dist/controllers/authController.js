@@ -68,10 +68,16 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         // Generate verification token
         const verificationToken = (0, generateToken_1.generateRandomToken)();
         const verificationTokenExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+        // Determine if first user
+        const isFirstAccount = (yield User_1.default.countDocuments({})) === 0;
+        const role = isFirstAccount ? "admin" : "user";
+        const isApproved = isFirstAccount; // First user is auto-approved
         const user = yield User_1.default.create({
             username,
             email,
             password,
+            role,
+            isApproved,
             verificationToken,
             verificationTokenExpires,
         });
@@ -191,11 +197,20 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 res.status(401).json({ message: "Please verify your email to login" });
                 return;
             }
+            if (!user.isApproved) {
+                res.status(401).json({
+                    message: "Account pending approval. Please contact admin.",
+                    isApproved: false, // Flag for frontend to redirect
+                });
+                return;
+            }
             const token = (0, generateToken_1.default)(user._id);
             res.json({
                 _id: user._id,
                 username: user.username,
                 email: user.email,
+                role: user.role,
+                isApproved: user.isApproved,
                 token,
             });
         }

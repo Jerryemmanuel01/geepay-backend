@@ -82,6 +82,15 @@ const UserSchema = new mongoose_1.Schema({
         type: Boolean,
         default: false,
     },
+    role: {
+        type: String,
+        enum: ["user", "admin"],
+        default: "user",
+    },
+    isApproved: {
+        type: Boolean,
+        default: false,
+    },
     verificationToken: String,
     verificationTokenExpires: Date,
     resetPasswordToken: String,

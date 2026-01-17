@@ -73,4 +73,6 @@ router.get("/profile", userController_1.getUserProfile);
  *         description: Invalid PIN format
  */
 router.put("/profile/pin", userController_1.updateTransactionPin);
+router.get("/unapproved", authMiddleware_1.protect, authMiddleware_1.admin, userController_1.getUnapprovedUsers);
+router.put("/:id/approve", authMiddleware_1.protect, authMiddleware_1.admin, userController_1.approveUser);
 exports.default = router;

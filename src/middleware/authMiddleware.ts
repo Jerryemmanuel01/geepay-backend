@@ -33,6 +33,13 @@ export const protect = async (
         return;
       }
 
+      if (!req.user.isApproved) {
+        res
+          .status(403)
+          .json({ message: "Not authorized. Account pending approval." });
+        return;
+      }
+
       next();
     } catch (error) {
       console.error(error);
@@ -42,5 +49,17 @@ export const protect = async (
 
   if (!token) {
     res.status(401).json({ message: "Not authorized, no token" });
+  }
+};
+
+export const admin = (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): void => {
+  if (req.user && req.user.role === "admin") {
+    next();
+  } else {
+    res.status(401).json({ message: "Not authorized as an admin" });
   }
 };
